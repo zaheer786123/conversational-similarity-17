@@ -11,6 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Mic, Trash } from "lucide-react";
 
+// Define proper types for code block props
+interface CodeProps {
+  className?: string;
+  children: React.ReactNode;
+  inline?: boolean;
+}
+
 export const Chat = () => {
   const [user] = useAuthState(auth);
   const [input, setInput] = useState("");
@@ -101,28 +108,26 @@ export const Chat = () => {
               key={idx}
               className={`flex ${msg.isAI ? "bg-chatbg" : "bg-input"} p-4`}
             >
-              <div className="flex-1 max-w-4xl mx-auto">
+              <div className="flex-1 max-w-4xl mx-auto prose prose-invert">
                 <ReactMarkdown
                   components={{
-                    code({node, inline, className, children, ...props}) {
+                    code: ({ className, children, inline }: CodeProps) => {
+                      if (inline) {
+                        return <code className={className}>{children}</code>;
+                      }
                       const match = /language-(\w+)/.exec(className || "");
-                      return !inline && match ? (
+                      const language = match ? match[1] : "";
+                      return (
                         <SyntaxHighlighter
                           style={vscDarkPlus}
-                          language={match[1]}
+                          language={language}
                           PreTag="div"
-                          {...props}
                         >
                           {String(children).replace(/\n$/, "")}
                         </SyntaxHighlighter>
-                      ) : (
-                        <code className={className} {...props}>
-                          {children}
-                        </code>
                       );
                     },
                   }}
-                  className="text-white prose prose-invert"
                 >
                   {msg.text}
                 </ReactMarkdown>
