@@ -1,14 +1,21 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/lib/firebase";
+import { Auth } from "@/components/Auth";
+import { Chat } from "@/components/Chat";
 
 const Index = () => {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+  const [user, loading] = useAuthState(auth);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-chatbg">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return user ? <Chat /> : <Auth />;
 };
 
 export default Index;
